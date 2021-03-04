@@ -2,6 +2,7 @@ import {useState} from 'react';
 import _ from 'lodash';
 
 import Criterion from '../criterion';
+import NumberInput from '../number-input';
 
 import data from './data';
 import logo from './logo.svg';
@@ -21,6 +22,8 @@ const initialState = {
   coloris: '',
   finition: '',
   epaisseur: '',
+  longueur_plan: 0,
+  largeur_plan: 0,
 };
 
 function resetSubCriteria(criterionLabel) {
@@ -55,18 +58,22 @@ function App() {
   function onCriterionChanged(criterionLabel) {
     return (event) => {
       const updatedSubCriteria = resetSubCriteria(criterionLabel);
-      setState({
-        ...state,
-        updatedSubCriteria,
-        [criterionLabel]: event.target.value
-      });
+      setState(
+        Object.assign(
+          {},
+          state,
+          updatedSubCriteria,
+          {
+            [criterionLabel]: event.target.value
+          }
+      ));
     };
   }
 
   const onMateriauChanged = onCriterionChanged('materiau');
   const onColorisChanged = onCriterionChanged('coloris');
-  // const onFinitionChanged = onCriterionChanged('finition');
-  // const onEpaisseurChanged = onCriterionChanged('epaisseur');
+  const onFinitionChanged = onCriterionChanged('finition');
+  const onEpaisseurChanged = onCriterionChanged('epaisseur');
 
   function getCriterionData(criterionLabel) {
     switch (criterionLabel) {
@@ -105,6 +112,25 @@ function App() {
             typeLabel='Coloris'
             itemValues={buildItemValues('coloris')}
           ></Criterion>
+          <Criterion
+            value={state.finition}
+            handleChange={onFinitionChanged}
+            typeLabel='Finition'
+            itemValues={buildItemValues('finition')}
+          ></Criterion>
+          <Criterion
+            value={state.epaisseur}
+            handleChange={onEpaisseurChanged}
+            typeLabel='Épaisseur'
+            itemValues={buildItemValues('epaisseur')}
+          ></Criterion>
+        </div>
+        <div style={{display: 'flex'}}>
+          <NumberInput
+            value={state.longueur_plan}
+            handleChange={onFieldChanged('longueur_plan')}
+            typeLabel='Longueur'
+          ></NumberInput>
         </div>
       </header>
     </div>
