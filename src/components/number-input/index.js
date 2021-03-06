@@ -14,10 +14,8 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(1),
   },
   withoutLabel: {
-    marginTop: theme.spacing(3),
   },
   textField: {
-    width: '25ch',
   },
 }));
 
@@ -27,17 +25,16 @@ function NumberInput(props) {
   return <FormControl
     className={clsx(classes.margin, classes.withoutLabel, classes.textField)}
   >
+    <FormHelperText id="standard-weight-helper-text">{props.typeLabel}</FormHelperText>
+
     <Input
-      id="standard-adornment-weight"
       value={props.value}
       onChange={props.handleChange}
       endAdornment={<InputAdornment position="end">mm</InputAdornment>}
-      aria-describedby="standard-weight-helper-text"
       inputProps={{
-        'aria-label': 'weight',
+        'aria-label': props.typeLabel,
       }}
     />
-    <FormHelperText id="standard-weight-helper-text">Longueur</FormHelperText>
   </FormControl>;
 }
 

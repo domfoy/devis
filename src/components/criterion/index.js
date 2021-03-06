@@ -32,6 +32,7 @@ function Criterion(props) {
     <InputLabel id="demo-controlled-open-select-label">{props.typeLabel}</InputLabel>
 
     <Select
+      disabled={!items.length}
       value={props.value}
       onChange={props.handleChange}
     >{items}</Select>
