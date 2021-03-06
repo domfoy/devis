@@ -34,7 +34,7 @@ function Criterion(props) {
     <Select
       disabled={!items.length}
       value={props.value}
-      onChange={props.handleChange}
+      onChange={props.onChange}
     >{items}</Select>
   </FormControl>;
 }

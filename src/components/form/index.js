@@ -7,6 +7,7 @@ import CardContent from '@material-ui/core/CardContent';
 
 import Criterion from '../criterion';
 import NumberInput from '../number-input';
+import Shape from '../shape';
 
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -42,6 +43,7 @@ const initialState = {
   epaisseur: '',
   longueur_plan: 0,
   largeur_plan: 0,
+  forme: 'standard'
 };
 
 function resetSubCriteria(criterionLabel) {
@@ -191,19 +193,19 @@ function Form(props) {
     <>
       <Criterion
         value={state.materiau}
-        handleChange={onMateriauChanged}
+        onChange={onMateriauChanged}
         typeLabel='Matériau'
         itemValues={buildItemValues('materiau')}
       ></Criterion>
       <Criterion
         value={state.coloris}
-        handleChange={onColorisChanged}
+        onChange={onColorisChanged}
         typeLabel='Coloris'
         itemValues={buildItemValues('coloris')}
       ></Criterion>
       <Criterion
         value={state.finition}
-        handleChange={onFinitionChanged}
+        onChange={onFinitionChanged}
         typeLabel='Finition'
         itemValues={buildItemValues('finition')}
       ></Criterion>
@@ -216,21 +218,30 @@ function Form(props) {
     <>
       <NumberInput
         value={state.longueur_plan}
-        handleChange={onFieldChanged('longueur_plan', [parseNumberField])}
+        onChange={onFieldChanged('longueur_plan', [parseNumberField])}
         typeLabel='Longueur'
       ></NumberInput>
       <NumberInput
         value={state.largeur_plan}
-        handleChange={onFieldChanged('largeur_plan', [parseNumberField])}
+        onChange={onFieldChanged('largeur_plan', [parseNumberField])}
         typeLabel='Largeur'
       ></NumberInput>
       <Criterion
         value={state.epaisseur}
-        handleChange={onEpaisseurChanged}
+        onChange={onEpaisseurChanged}
         typeLabel='Épaisseur'
         itemValues={buildItemValues('epaisseur')}
       ></Criterion>
       {formatMoney(getAmount())}
+    </>
+  );
+
+  const shapeSection = (
+    <>
+      <Shape
+        value={state.forme}
+        onChange={onFieldChanged('forme')}
+      ></Shape>
     </>
   );
 
@@ -239,6 +250,7 @@ function Form(props) {
       <div className={classes.editable}>
         <Section classes={classes} title={"1. Choix du matériau"}>{materiauSection}</Section>
         <Section classes={classes} title={"2. Dimensions du plan"}>{planSection}</Section>
+        <Section classes={classes} title={"3. Choix de la forme"}>{shapeSection}</Section>
       </div>
       <div className={classes.summary}>
         <Section classes={classes} title={"Estimation du devis"}>{"coucou"}</Section>

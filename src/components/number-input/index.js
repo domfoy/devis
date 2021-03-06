@@ -29,7 +29,7 @@ function NumberInput(props) {
 
     <Input
       value={props.value}
-      onChange={props.handleChange}
+      onChange={props.onChange}
       endAdornment={<InputAdornment position="end">mm</InputAdornment>}
       inputProps={{
         'aria-label': props.typeLabel,
