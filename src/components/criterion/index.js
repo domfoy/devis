@@ -29,7 +29,7 @@ function Criterion(props) {
   const items = buildItems(props.itemValues);
 
   return <FormControl className={classes.formControl}>
-    <InputLabel id="demo-controlled-open-select-label">{props.typeLabel}</InputLabel>
+    <InputLabel id="demo-controlled-open-select-label">{props.label}</InputLabel>
 
     <Select
       disabled={!items.length}

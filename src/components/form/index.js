@@ -4,10 +4,12 @@ import _ from 'lodash';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardContent';
 import CardContent from '@material-ui/core/CardContent';
+import InputAdornment from '@material-ui/core/InputAdornment';
 
 import Criterion from '../criterion';
 import NumberInput from '../number-input';
 import Shape from '../shape';
+import * as d from '../decoupes';
 
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -18,9 +20,19 @@ const useStyles = makeStyles((theme) => ({
   },
   editable: {
     display: 'flex',
+    flexGrow: 3,
     flexDirection: 'column',
   },
+  decoupeSection: {
+    display: 'flex',
+    flexWrap: 'wrap'
+  },
+  decoupeWrapper: {
+    padding: theme.spacing(1)
+  },
   summary: {
+    position: 'sticky',
+    top: theme.spacing(3)
   },
   outerSection: {
     padding: theme.spacing(1)
@@ -43,8 +55,17 @@ const initialState = {
   epaisseur: '',
   longueur_plan: 0,
   largeur_plan: 0,
-  forme: 'standard'
+  forme: 'standard',
+  decoupes: _.map(
+    d.decoupes,
+    (value, id) => ({
+      id,
+      value: 0
+    })
+  )
 };
+
+const sizeAdornment = <InputAdornment position="end">mm</InputAdornment>;
 
 function resetSubCriteria(criterionLabel) {
   switch (criterionLabel) {
@@ -95,7 +116,7 @@ function parseNumberField(str) {
 
 function Section(props) {
   return (
-    <div className={props.classes.outerSection}>
+    <div className={props.classes.outerSection} style={props.customStyle}>
       <Card className={props.classes.innerSection}>
         <CardHeader
           className={props.classes.sectionHeader}
@@ -137,11 +158,15 @@ function Form(props) {
       for (const fn of middlewares) {
         res = fn(res);
       }
+      const newState = _.set(
+        {
+          ...state,
+        },
+        key,
+        res
+      );
 
-      setState({
-        ...state,
-        [key]: res
-      })
+      setState(newState);
     };
   }
 
@@ -194,19 +219,19 @@ function Form(props) {
       <Criterion
         value={state.materiau}
         onChange={onMateriauChanged}
-        typeLabel='Matériau'
+        label='Matériau'
         itemValues={buildItemValues('materiau')}
       ></Criterion>
       <Criterion
         value={state.coloris}
         onChange={onColorisChanged}
-        typeLabel='Coloris'
+        label='Coloris'
         itemValues={buildItemValues('coloris')}
       ></Criterion>
       <Criterion
         value={state.finition}
         onChange={onFinitionChanged}
-        typeLabel='Finition'
+        label='Finition'
         itemValues={buildItemValues('finition')}
       ></Criterion>
 
@@ -219,17 +244,19 @@ function Form(props) {
       <NumberInput
         value={state.longueur_plan}
         onChange={onFieldChanged('longueur_plan', [parseNumberField])}
-        typeLabel='Longueur'
+        label='Longueur'
+        adornment={sizeAdornment}
       ></NumberInput>
       <NumberInput
         value={state.largeur_plan}
         onChange={onFieldChanged('largeur_plan', [parseNumberField])}
-        typeLabel='Largeur'
+        label='Largeur'
+        adornment={sizeAdornment}
       ></NumberInput>
       <Criterion
         value={state.epaisseur}
         onChange={onEpaisseurChanged}
-        typeLabel='Épaisseur'
+        label='Épaisseur'
         itemValues={buildItemValues('epaisseur')}
       ></Criterion>
       {formatMoney(getAmount())}
@@ -245,15 +272,38 @@ function Form(props) {
     </>
   );
 
+  const decoupeSection = (
+    <div className={classes.decoupeSection}>
+      {state.decoupes.map(decoupe => {
+        const id = decoupe.id;
+        const index = _.findIndex(state.decoupes, {id});
+        const value = state.decoupes[index].value;
+
+        return <div className={classes.decoupeWrapper}>
+          <d.Decoupe
+            id={id}
+            key={id}
+            value={value}
+            onChange={onFieldChanged(`decoupes[${index}].value`, [parseNumberField])}
+          />
+        </div>
+      })}
+    </div>
+  );
+
   return (
     <div className={classes.form}>
       <div className={classes.editable}>
         <Section classes={classes} title={"1. Choix du matériau"}>{materiauSection}</Section>
         <Section classes={classes} title={"2. Dimensions du plan"}>{planSection}</Section>
-        <Section classes={classes} title={"3. Choix de la forme"}>{shapeSection}</Section>
+        <Section classes={classes} title={"4. Choix du chanfrein"}>{shapeSection}</Section>
+        <Section classes={classes} title={"5. Choix des découpes"}>{decoupeSection}</Section>
       </div>
-      <div className={classes.summary}>
-        <Section classes={classes} title={"Estimation du devis"}>{"coucou"}</Section>
+      <div>
+        <Section classes={classes} customStyle={{
+          position: 'sticky',
+          top: '16px'
+        }} title={"Estimation du devis"}>{"fzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"}</Section>
       </div>
     </div>
   );

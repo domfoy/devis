@@ -136,6 +136,7 @@ function Shape(props) {
           _.map(
             images,
             (image, key) => <MenuItem
+              key={key}
               onClick={mkSelectShape(key)}
             >
               <CardImage

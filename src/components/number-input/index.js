@@ -3,7 +3,6 @@ import {makeStyles} from '@material-ui/core/styles';
 import FormControl from '@material-ui/core/FormControl';
 import Input from '@material-ui/core/Input';
 import FormHelperText from '@material-ui/core/FormHelperText';
-import InputAdornment from '@material-ui/core/InputAdornment';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -25,14 +24,14 @@ function NumberInput(props) {
   return <FormControl
     className={clsx(classes.margin, classes.withoutLabel, classes.textField)}
   >
-    <FormHelperText id="standard-weight-helper-text">{props.typeLabel}</FormHelperText>
+    <FormHelperText id="standard-weight-helper-text">{props.label}</FormHelperText>
 
     <Input
       value={props.value}
       onChange={props.onChange}
-      endAdornment={<InputAdornment position="end">mm</InputAdornment>}
+      endAdornment={props.adornment}
       inputProps={{
-        'aria-label': props.typeLabel,
+        'aria-label': props.label,
       }}
     />
   </FormControl>;
