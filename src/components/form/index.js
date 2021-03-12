@@ -5,6 +5,9 @@ import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardContent';
 import CardContent from '@material-ui/core/CardContent';
 import InputAdornment from '@material-ui/core/InputAdornment';
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
 
 import Criterion from '../criterion';
 import NumberInput from '../number-input';
@@ -62,7 +65,27 @@ const initialState = {
       id,
       value: 0
     })
-  )
+  ),
+  services: [
+    {
+      id: 'coteRayonInf',
+      label: 'Prise de côte rayon < 50km',
+      price: 90,
+      value: false
+    },
+    {
+      id: 'coteRayonSup',
+      label: 'Prise de côte rayon >= 50km',
+      price: 170,
+      value: false
+    },
+    {
+      id: 'livInf',
+      label: 'Livraison rayon < 50km',
+      price: 110,
+      value: false
+    },
+  ]
 };
 
 const sizeAdornment = <InputAdornment position="end">mm</InputAdornment>;
@@ -150,9 +173,9 @@ function Form(props) {
     };
   }
 
-  function onFieldChanged(key, middlewares = []) {
+  function onFieldChanged(key, middlewares = [], {targetPath = 'target.value'} = {}) {
     return event => {
-      const value = event.target.value;
+      const value = _.get(event, targetPath);
       let res = value;
 
       for (const fn of middlewares) {
@@ -291,6 +314,30 @@ function Form(props) {
     </div>
   );
 
+  const serviceSection = (
+    <FormGroup>
+      {state.services.map(service => {
+        const id = service.id;
+        const index = _.findIndex(state.services, {id});
+        const label = state.services[index].label;
+        const value = state.services[index].value;
+
+        return <FormControlLabel
+          id={id}
+          key={id}
+          control={
+            <Switch
+              checked={value}
+              onChange={onFieldChanged(`services[${index}].value`, [], {targetPath: 'target.checked'})}
+            />
+          }
+          label={label}
+        >
+        </FormControlLabel>
+      })}
+    </FormGroup>
+  );
+
   return (
     <div className={classes.form}>
       <div className={classes.editable}>
@@ -298,6 +345,7 @@ function Form(props) {
         <Section classes={classes} title={"2. Dimensions du plan"}>{planSection}</Section>
         <Section classes={classes} title={"4. Choix du chanfrein"}>{shapeSection}</Section>
         <Section classes={classes} title={"5. Choix des découpes"}>{decoupeSection}</Section>
+        <Section classes={classes} title={"5. Nos services"}>{serviceSection}</Section>
       </div>
       <div>
         <Section classes={classes} customStyle={{
