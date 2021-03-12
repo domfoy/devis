@@ -1,20 +1,10 @@
 import Form from '../form';
-
-import data from './data';
 import './App.css';
 
-// const useStyles = makeStyles((theme) => ({
-//   button: {
-//     display: 'flex',
-//     marginTop: theme.spacing(2),
-//   }
-// }));
-
-
-function App() {
+function App(props) {
   return (
     <article className="App">
-      <Form data={data}/>
+      <Form data={props.data}/>
     </article>
   );
 }
