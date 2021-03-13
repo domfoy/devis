@@ -20,13 +20,24 @@ const useStyles = makeStyles((theme) => ({
 function buildItems(items) {
   return _.map(
     items,
-    item => <MenuItem key={item.key} value={item.key}>{item.value}</MenuItem>
+    item => <MenuItem key={item.key} value={item.key}>{item.labelValue || item.value}</MenuItem>
   );
+}
+
+function mkRenderValue(items) {
+  return (value) => {
+    const item = _.find(
+      items,
+      {value}
+    );
+    return item.value;
+  }
 }
 
 function Criterion(props) {
   const classes = useStyles();
   const items = buildItems(props.itemValues);
+  const renderValue = mkRenderValue(props.itemValues);
 
   return <FormControl className={classes.formControl}>
     <InputLabel id="demo-controlled-open-select-label">{props.label}</InputLabel>
@@ -35,6 +46,7 @@ function Criterion(props) {
       disabled={!items.length}
       value={props.value}
       onChange={props.onChange}
+      renderValue={renderValue}
     >{items}</Select>
   </FormControl>;
 }

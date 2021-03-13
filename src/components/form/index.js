@@ -101,10 +101,6 @@ function resetSubCriteria(criterionLabel) {
   };
 }
 
-function makeItems(source) {
-  return Object.keys(source).map((key) => ({key, value: key}));
-}
-
 function parseNumberField(str) {
   const number = parseInt(str, 10);
 
@@ -176,6 +172,21 @@ function Form(props) {
   const onFinitionChanged = onCriterionChanged('finition');
   const onEpaisseurChanged = onCriterionChanged('epaisseur');
 
+  function makeItems(criterionLabel, source) {
+    if (criterionLabel !== 'epaisseur') {
+      return Object.keys(source).map((key) => ({key, value: key}));
+    }
+
+    return _.map(
+      source,
+      (value, key) => ({
+        key,
+        value: key,
+        labelValue: `${key} mm (${formatPrice(value)}/m2)`
+      })
+    );
+  }
+
   function getCriterionData(criterionLabel) {
     switch (criterionLabel) {
       case 'materiau':
@@ -194,7 +205,7 @@ function Form(props) {
   function buildItemValues(criterionLabel) {
     let criterionData = getCriterionData(criterionLabel);
 
-    return makeItems(criterionData);
+    return makeItems(criterionLabel, criterionData);
   }
 
   const getPerUnit = useCallback(
@@ -278,8 +289,6 @@ function Form(props) {
         label='Finition'
         itemValues={buildItemValues('finition')}
       ></Criterion>
-
-      {formatPrice(getPerUnit())}
     </>
   );
 
@@ -303,7 +312,6 @@ function Form(props) {
         label='Épaisseur'
         itemValues={buildItemValues('epaisseur')}
       ></Criterion>
-      {formatPrice(getAmount())}
     </>
   );
 
