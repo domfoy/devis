@@ -4,7 +4,12 @@ import './index.css';
 import App from './components/app';
 import reportWebVitals from './reportWebVitals';
 
-import defaultData from './data';
+import {
+  decoupes,
+  formes,
+  materiaux,
+  services,
+} from './data';
 
 function getRootId() {
   if (process.env.NODE_ENV === 'production') {
@@ -14,7 +19,7 @@ function getRootId() {
   return 'root';
 }
 
-function fetchJsonData() {
+function fetchMateriaux() {
   const jsonPath = `${process.env.PUBLIC_URL}/data.json`;
 
   return fetch(
@@ -32,13 +37,13 @@ function fetchJsonData() {
     });
 }
 
-function bootApp(_target, _data) {
+function bootApp(_target, data) {
   if (!_target) {
     return;
   }
   ReactDOM.render(
     <React.StrictMode>
-      <App data={_data}/>
+      <App data={data}/>
     </React.StrictMode>,
     target
   );
@@ -48,16 +53,37 @@ const rootId = getRootId();
 const target = document.getElementById(rootId);
 
 if (process.env.NODE_ENV === 'production') {
-  fetchJsonData()
-    .then(jsonData => {
-      if (jsonData) {
-        bootApp(target, jsonData);
+  fetchMateriaux()
+    .then(fetchedMateriaux => {
+      if (fetchedMateriaux) {
+        const data = {
+          decoupes,
+          formes,
+          materiaux: fetchedMateriaux,
+          services,
+        };
+
+        bootApp(target, data);
       } else {
-        bootApp(target, defaultData);
+        const data = {
+          decoupes,
+          formes,
+          materiaux,
+          services,
+        };
+
+        bootApp(target, data);
       }
-    })
+    });
 } else {
-  bootApp(target, defaultData);
+  const data = {
+    decoupes,
+    formes,
+    materiaux,
+    services,
+  };
+
+  bootApp(target, data);
 }
 
 // If you want to start measuring performance in your app, pass a function

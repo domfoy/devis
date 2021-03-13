@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useCallback, useState} from 'react';
 import _ from 'lodash';
 
 import Card from '@material-ui/core/Card';
@@ -12,9 +12,10 @@ import Switch from '@material-ui/core/Switch';
 import Criterion from '../criterion';
 import NumberInput from '../number-input';
 import Shape from '../shape';
-import * as d from '../decoupes';
-
-import { makeStyles } from '@material-ui/core/styles';
+import Decoupe from '../decoupes';
+import formatPrice from '../../format-price';
+import {decoupes, services} from '../../data';
+import {makeStyles} from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -60,32 +61,20 @@ const initialState = {
   largeur_plan: 0,
   forme: 'standard',
   decoupes: _.map(
-    d.decoupes,
+    decoupes,
     (value, id) => ({
       id,
       value: 0
     })
   ),
-  services: [
-    {
-      id: 'coteRayonInf',
-      label: 'Prise de côte rayon < 50km',
-      price: 90,
+  services: _.map(
+    services,
+    (value, id) => ({
+      id,
       value: false
-    },
-    {
-      id: 'coteRayonSup',
-      label: 'Prise de côte rayon >= 50km',
-      price: 170,
-      value: false
-    },
-    {
-      id: 'livInf',
-      label: 'Livraison rayon < 50km',
-      price: 110,
-      value: false
-    },
-  ]
+    })
+  ),
+  isTvaReduced: false
 };
 
 const sizeAdornment = <InputAdornment position="end">mm</InputAdornment>;
@@ -114,17 +103,6 @@ function resetSubCriteria(criterionLabel) {
 
 function makeItems(source) {
   return Object.keys(source).map((key) => ({key, value: key}));
-}
-
-function formatMoney(value) {
-  return Intl.NumberFormat(
-    'fr-FR',
-    {
-      style: 'currency',
-      currency: 'EUR'
-    }
-  )
-    .format(value);
 }
 
 function parseNumberField(str) {
@@ -201,13 +179,13 @@ function Form(props) {
   function getCriterionData(criterionLabel) {
     switch (criterionLabel) {
       case 'materiau':
-        return props.data;
+        return props.data.materiaux;
       case 'coloris':
-        return _.get(props.data, [state.materiau], []);
+        return _.get(props.data.materiaux, [state.materiau], []);
       case 'finition':
-        return _.get(props.data, [state.materiau, state.coloris], []);
+        return _.get(props.data.materiaux, [state.materiau, state.coloris], []);
       case 'epaisseur':
-        return _.get(props.data, [state.materiau, state.coloris, state.finition], []);
+        return _.get(props.data.materiaux, [state.materiau, state.coloris, state.finition], []);
       default:
         return [];
     }
@@ -219,14 +197,9 @@ function Form(props) {
     return makeItems(criterionData);
   }
 
-  function getAmount() {
-    const perUnit = getPerUnit();
-    return perUnit * state.largeur_plan * state.longueur_plan;
-  }
-
-  function getPerUnit() {
-    return _.get(
-      props.data,
+  const getPerUnit = useCallback(
+    () => _.get(
+      props.data.materiaux,
       [
         state.materiau,
         state.coloris,
@@ -234,8 +207,56 @@ function Form(props) {
         state.epaisseur,
       ],
       0
-    );
-  }
+    ),
+    [
+      props.data.materiaux,
+      state.materiau,
+      state.coloris,
+      state.finition,
+      state.epaisseur,
+    ]
+  );
+
+  const getAmount = useCallback(
+    () => {
+      const perUnit = getPerUnit();
+
+      return perUnit * state.largeur_plan * state.longueur_plan / 10000;
+    },
+    [
+      state.largeur_plan,
+      state.longueur_plan,
+      getPerUnit,
+    ]
+  );
+
+  const getDecoupesAmount = () => _.reduce(
+    state.decoupes,
+    (acc, cur) => {
+      const decoupeAmount = props.data.decoupes[cur.id].price * cur.value;
+
+      return acc + decoupeAmount;
+    },
+    0
+  );
+
+  const getServicesAmount = () => _.reduce(
+    state.services,
+    (acc, cur) => {
+      const serviceAmount = props.data.services[cur.id].price * (cur.value ? 1 : 0);
+
+      return acc + serviceAmount;
+    },
+    0
+  );
+
+  const getForme = useCallback(
+    () => props.data.formes[state.forme].price,
+    [
+      state.forme,
+      props.data.formes
+    ]
+  );
 
   const materiauSection = (
     <>
@@ -258,7 +279,7 @@ function Form(props) {
         itemValues={buildItemValues('finition')}
       ></Criterion>
 
-      {formatMoney(getPerUnit())}
+      {formatPrice(getPerUnit())}
     </>
   );
 
@@ -282,13 +303,14 @@ function Form(props) {
         label='Épaisseur'
         itemValues={buildItemValues('epaisseur')}
       ></Criterion>
-      {formatMoney(getAmount())}
+      {formatPrice(getAmount())}
     </>
   );
 
   const shapeSection = (
     <>
       <Shape
+        data={props.data.formes}
         value={state.forme}
         onChange={onFieldChanged('forme')}
       ></Shape>
@@ -303,7 +325,8 @@ function Form(props) {
         const value = state.decoupes[index].value;
 
         return <div className={classes.decoupeWrapper}>
-          <d.Decoupe
+          <Decoupe
+            data={props.data.decoupes}
             id={id}
             key={id}
             value={value}
@@ -319,7 +342,7 @@ function Form(props) {
       {state.services.map(service => {
         const id = service.id;
         const index = _.findIndex(state.services, {id});
-        const label = state.services[index].label;
+        const label = props.data.services[id].label;
         const value = state.services[index].value;
 
         return <FormControlLabel
@@ -338,6 +361,37 @@ function Form(props) {
     </FormGroup>
   );
 
+  const tvaSection = (
+    <FormGroup>
+      <FormControlLabel
+          control={
+            <Switch
+              checked={state.isTvaReduced}
+              onChange={onFieldChanged('isTvaReduced', [], {targetPath: 'target.checked'})}
+            />
+          }
+          label={'Habitation de plus de 2 ans TVA à 10% (TVA à 10% applicable aux logements à usage d\'habitation de plus de 2 ans si l\'installation est réalisée par nos soins. Sinon, TVA à 20%)'}
+        >
+      </FormControlLabel>
+    </FormGroup>
+  );
+
+  const getTotal = () => {
+    const montantMateriau = getAmount();
+    const montantForme = getForme();
+    const montantDecoupes = getDecoupesAmount();
+    const montantServices = getServicesAmount();
+    const montantHt = montantMateriau + montantForme + montantDecoupes + montantServices;
+    const tva = state.isTvaReduced
+      ? 1.1
+      : 1.2;
+    const total = montantHt * tva;
+
+    return total;
+  }
+
+  const total = getTotal();
+
   return (
     <div className={classes.form}>
       <div className={classes.editable}>
@@ -345,13 +399,14 @@ function Form(props) {
         <Section classes={classes} title={"2. Dimensions du plan"}>{planSection}</Section>
         <Section classes={classes} title={"4. Choix du chanfrein"}>{shapeSection}</Section>
         <Section classes={classes} title={"5. Choix des découpes"}>{decoupeSection}</Section>
-        <Section classes={classes} title={"5. Nos services"}>{serviceSection}</Section>
+        <Section classes={classes} title={"6. Nos services"}>{serviceSection}</Section>
+        <Section classes={classes} title={"7. TVA à appliquer"}>{tvaSection}</Section>
       </div>
       <div>
         <Section classes={classes} customStyle={{
           position: 'sticky',
           top: '16px'
-        }} title={"Estimation du devis"}>{"fzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"}</Section>
+        }} title={"Estimation du devis"}>{formatPrice(total)}</Section>
       </div>
     </div>
   );

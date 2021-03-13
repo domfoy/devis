@@ -1,5 +1,8 @@
 import _ from 'lodash';
-import {useState} from 'react';
+import {
+  useCallback,
+  useState
+} from 'react';
 
 import aile_avion from './aile_avion.jpg';
 import demi_cercle from './demi_cercle.jpg';
@@ -11,10 +14,16 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 import Typography from '@material-ui/core/Typography';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
-import CardMedia from '@material-ui/core/CardMedia';
 import CardContent from '@material-ui/core/CardContent';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+
+const imageContents = {
+  aile_avion,
+  demi_cercle,
+  quart_cercle,
+  standard,
+};
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -42,29 +51,6 @@ const useStyles = makeStyles((theme) => ({
     transition: theme.transitions.create('opacity'),
   },
 }));
-
-const images = {
-  aile_avion: {
-    priceLabel: '28€ le ml',
-    title: 'Chant aile d\'avion',
-    url: aile_avion,
-  },
-  demi_cercle: {
-    priceLabel: '20€ le ml',
-    title: 'Chant demi-cercle',
-    url: demi_cercle,
-  },
-  quart_cercle: {
-    priceLabel: '13€ le ml',
-    title: 'Chant quart-cercle',
-    url: quart_cercle,
-  },
-  standard: {
-    priceLabel: 'offert',
-    title: 'Chant standard',
-    url: standard,
-  },
-}
 
 function CardImage(props) {
   return (
@@ -95,7 +81,28 @@ function Shape(props) {
   const [state, setState] = useState('initial');
   const classes = useStyles();
 
+  const buildImages = useCallback(
+    () => _.mapValues(
+      props.data,
+      (value, key) => ({
+        ...value,
+        priceLabel: value.price !== 0
+          ? `${value.price} € le ml`
+          : 'Offert',
+        url: imageContents[key]
+      })
+    ),
+    [
+      props.data
+    ]
+  );
+
+  const images = buildImages(props.data);
   const image = images[props.value];
+
+  if (!image) {
+    return null;
+  }
 
   const mkSelectShape = (shape) => {
     return () => {
