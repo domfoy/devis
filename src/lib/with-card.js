@@ -1,6 +1,6 @@
 import Card from '@material-ui/core/Card';
 
-export function withCard(child) {
+export default function withCard(child) {
   return (
     <Card>
       {child}

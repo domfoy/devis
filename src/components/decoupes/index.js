@@ -13,7 +13,7 @@ import Typography from '@material-ui/core/Typography';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 
-import formatPrice from '../../format-price';
+import {formatPrice} from '../../lib';
 import {useCallback} from 'react';
 
 const imageContents = {

@@ -1,29 +1,31 @@
 import {useCallback, useState} from 'react';
 import _ from 'lodash';
-
-import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardContent';
-import CardContent from '@material-ui/core/CardContent';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 
+import {
+  formatPrice,
+  Section
+} from '../../lib';
+import Recap from '../recap';
 import Criterion from '../criterion';
 import NumberInput from '../number-input';
 import Shape from '../shape';
 import Decoupe from '../decoupes';
-import formatPrice from '../../format-price';
 import {decoupes, services} from '../../data';
 import {makeStyles} from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
   form: {
     display: 'flex',
+    width: '100vw',
     marginTop: theme.spacing(2),
   },
   editable: {
     display: 'flex',
+    width: '60%',
     flexGrow: 3,
     flexDirection: 'column',
   },
@@ -111,22 +113,38 @@ function parseNumberField(str) {
   return 0;
 }
 
-function Section(props) {
-  return (
-    <div className={props.classes.outerSection} style={props.customStyle}>
-      <Card className={props.classes.innerSection}>
-        <CardHeader
-          className={props.classes.sectionHeader}
-        >
-          <span>{props.title}</span>
-        </CardHeader>
-        <CardContent>
-          {props.children}
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
+// function buildRecapLineSections() {
+//   return [
+//   [
+//     {
+//       label: 'ligne A',
+//       value: 10
+//     },
+//     {
+//       label: 'TVA à 10 %',
+//       value: 1
+//     },
+//     {
+//       label: 'Total TTC',
+//       value: 11
+//     }
+//   ],
+//   [
+//     {
+//       label: 'Sous-total HT',
+//       value: 10
+//     },
+//     {
+//       label: 'TVA à 10 %',
+//       value: 1
+//     },
+//     {
+//       label: 'Total TTC',
+//       value: 11
+//     }
+//   ]
+// ];
+// }
 
 function Form(props) {
   const [state, setState] = useState(initialState);
@@ -384,7 +402,7 @@ function Form(props) {
     </FormGroup>
   );
 
-  const getTotal = () => {
+  const buildRecapLineSections = () => {
     const montantMateriau = getAmount();
     const montantForme = getForme();
     const montantDecoupes = getDecoupesAmount();
@@ -395,10 +413,55 @@ function Form(props) {
       : 1.2;
     const total = montantHt * tva;
 
-    return total;
+    const res = [];
+
+    const materiauSection = [{
+      label: 'Sous-total plan',
+      value: montantMateriau
+    }];
+
+    const formeSection = [{
+      label: 'Sous-total chanfrein',
+      value: montantForme
+    }];
+
+    const decoupeSection = [{
+      label: 'Sous-total découpes',
+      value: montantDecoupes
+    }];
+
+    const serviceSection = [{
+      label: 'Sous-total services',
+      value: montantServices
+    }];
+
+    const totalSection = [
+      {
+        label: 'Sous-total HT',
+        value: montantHt
+      },
+      {
+        label: state.isTvaReduced
+          ? 'TVA à 10 %'
+          : 'TVA à 20 %',
+        value: total - montantHt
+      },
+      {
+        label: 'Total TTC',
+        value: total
+      }
+    ];
+
+    res.push(materiauSection);
+    res.push(formeSection);
+    res.push(decoupeSection);
+    res.push(serviceSection);
+    res.push(totalSection);
+
+    return res;
   }
 
-  const total = getTotal();
+  const recapLineSections = buildRecapLineSections();
 
   return (
     <div className={classes.form}>
@@ -410,11 +473,19 @@ function Form(props) {
         <Section classes={classes} title={"6. Nos services"}>{serviceSection}</Section>
         <Section classes={classes} title={"7. TVA à appliquer"}>{tvaSection}</Section>
       </div>
-      <div>
-        <Section classes={classes} customStyle={{
-          position: 'sticky',
-          top: '16px'
-        }} title={"Estimation du devis"}>{formatPrice(total)}</Section>
+      <div style={{
+        minWidth: '30%'
+      }}>
+        <Recap
+          classes={classes}
+          customStyle={{
+            position: 'sticky',
+            top: '16px'
+          }}
+          title={"Estimation du devis"}
+          lineSections={recapLineSections}
+        >
+        </Recap>
       </div>
     </div>
   );
