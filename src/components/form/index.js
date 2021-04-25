@@ -14,6 +14,7 @@ import Criterion from '../criterion';
 import NumberInput from '../number-input';
 import Shape from '../shape';
 import Decoupe from '../decoupes';
+import MailForm from "../mail-form";
 import {decoupes, services} from '../../data';
 import {makeStyles} from '@material-ui/core/styles';
 
@@ -465,17 +466,24 @@ function Form(props) {
   return (
     <div className={classes.form}>
       <div className={classes.editable}>
-        <Section classes={classes} title={"1. Choix du matériau"}>{materiauSection}</Section>
-        <Section classes={classes} title={"2. Dimensions du plan"}>{planSection}</Section>
-        <Section classes={classes} title={"4. Choix du chanfrein"}>{shapeSection}</Section>
-        <Section classes={classes} title={"5. Choix des découpes"}>{decoupeSection}</Section>
-        <Section classes={classes} title={"6. Nos services"}>{serviceSection}</Section>
-        <Section classes={classes} title={"7. TVA à appliquer"}>{tvaSection}</Section>
+        <Section classes={classes} title={"1. Choix du matériau"} key="materiau">{materiauSection}</Section>
+        <Section classes={classes} title={"2. Dimensions du plan"} key="plan">{planSection}</Section>
+        <Section classes={classes} title={"4. Choix du chanfrein"} key="shape">{shapeSection}</Section>
+        <Section classes={classes} title={"5. Choix des découpes"} key="decoupe">{decoupeSection}</Section>
+        <Section classes={classes} title={"6. Nos services"} key="service">{serviceSection}</Section>
+        <Section classes={classes} title={"7. TVA à appliquer"} key="tva">{tvaSection}</Section>
+
+        <MailForm
+          key="form"
+          lineSections={recapLineSections}
+        >
+        </MailForm>
       </div>
       <div style={{
         minWidth: '30%'
       }}>
         <Recap
+          key="recap"
           classes={classes}
           customStyle={{
             position: 'sticky',
