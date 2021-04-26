@@ -20,7 +20,7 @@ function getRootId() {
 }
 
 function fetchMateriaux() {
-  const jsonPath = `${process.env.PUBLIC_URL}/data.json`;
+  const jsonPath = `${process.env.PUBLIC_URL}/static/data.json`;
 
   return fetch(
     jsonPath,
