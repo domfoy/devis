@@ -428,7 +428,18 @@ function Form(props) {
     res.push(serviceSection);
     res.push(totalSection);
 
-    return res;
+    return _.map(
+      res,
+      section => {
+        return _.map(
+          section,
+          line => ({
+            ...line,
+            value: formatPrice(line.value || 0)
+          })
+        );
+      }
+    );
   }
 
   const recapLineSections = buildRecapLineSections();

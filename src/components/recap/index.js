@@ -27,7 +27,7 @@ function buildLine(line, index) {
     key={index}
   >
     <div>{line.label}</div>
-    <div>{formatPrice(line.value)}</div>
+    <div>{line.value}</div>
   </div>;
 }
 
