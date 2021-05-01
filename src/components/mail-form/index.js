@@ -171,7 +171,6 @@ function DialogContainer(props) {
               <Button
                 color="primary"
                 type="submit"
-                onClick={handleClose(onSubmit)}
               >
                 Valider
               </Button>
