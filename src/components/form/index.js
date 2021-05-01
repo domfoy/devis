@@ -159,7 +159,10 @@ function Form(props) {
 
   function makeItems(criterionLabel, source) {
     if (criterionLabel !== 'epaisseur') {
-      return Object.keys(source).map((key) => ({key, value: key}));
+      return _(Object.keys(source))
+        .map(key => ({key, value: key}))
+        .sortBy('key')
+        .value();
     }
 
     return _.map(
