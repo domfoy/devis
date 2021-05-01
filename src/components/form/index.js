@@ -113,39 +113,6 @@ function parseNumberField(str) {
   return 0;
 }
 
-// function buildRecapLineSections() {
-//   return [
-//   [
-//     {
-//       label: 'ligne A',
-//       value: 10
-//     },
-//     {
-//       label: 'TVA à 10 %',
-//       value: 1
-//     },
-//     {
-//       label: 'Total TTC',
-//       value: 11
-//     }
-//   ],
-//   [
-//     {
-//       label: 'Sous-total HT',
-//       value: 10
-//     },
-//     {
-//       label: 'TVA à 10 %',
-//       value: 1
-//     },
-//     {
-//       label: 'Total TTC',
-//       value: 11
-//     }
-//   ]
-// ];
-// }
-
 function Form(props) {
   const [state, setState] = useState(initialState);
   const classes = useStyles();
