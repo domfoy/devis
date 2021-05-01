@@ -163,19 +163,28 @@ function DialogContainer(props) {
         </DialogTitle>
         <MainForm
           lineSections={props.lineSections}
-          render={({onSubmit, formState}) => (
-            <DialogActions>
-              <Button onClick={handleClose()} color="primary">
-                Annuler
-              </Button>
-              <Button
-                color="primary"
-                type="submit"
-              >
-                Valider
-              </Button>
-            </DialogActions>
-          )}
+          render={({formState}) => {
+            const handleValidate = () => {
+              if (formState.isValid) {
+                return handleClose();
+              }
+            };
+
+            return (
+              <DialogActions>
+                <Button onClick={handleClose()} color="primary">
+                  Annuler
+                </Button>
+                <Button
+                  color="primary"
+                  type="submit"
+                  onClick={handleValidate()}
+                >
+                  Valider
+                </Button>
+              </DialogActions>
+            )
+          }}
         >
         </MainForm>
 
