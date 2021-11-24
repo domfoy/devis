@@ -138,7 +138,7 @@ function Form(props) {
       let res = value;
 
       for (const fn of middlewares) {
-        res = fn(res);
+        res = fn(res, event);
       }
       const newState = _.set(
         {
@@ -220,7 +220,7 @@ function Form(props) {
     () => {
       const perUnit = getPerUnit();
 
-      return perUnit * state.largeur_plan * state.longueur_plan / 10000;
+      return perUnit * state.largeur_plan * state.longueur_plan / 1000000;
     },
     [
       state.largeur_plan,
@@ -333,6 +333,34 @@ function Form(props) {
     </div>
   );
 
+  function getServiceById(id) {
+    return props.data.services[id];
+  }
+
+  function mkDeselectIncompatibleServices(id) {
+    return (selectedServiceValue) => {
+      if (selectedServiceValue === false) {
+        return selectedServiceValue
+      }
+
+      const selectedService = getServiceById(id);
+      const uncompatibleServices = _.filter(
+        state.services,
+        stateService => {
+          const service = getServiceById(stateService.id);
+
+          return service.exclusivityId
+            && service.exclusivityId === selectedService.exclusivityId;
+        }
+      );
+
+      for (const uncompatibleService of uncompatibleServices) {
+        uncompatibleService.value = false;
+      }
+
+      return selectedServiceValue;
+    };
+  }
   const serviceSection = (
     <FormGroup>
       {state.services.map(service => {
@@ -347,7 +375,13 @@ function Form(props) {
           control={
             <Switch
               checked={value}
-              onChange={onFieldChanged(`services[${index}].value`, [], {targetPath: 'target.checked'})}
+              onChange={onFieldChanged(
+                `services[${index}].value`,
+                [
+                  mkDeselectIncompatibleServices(id)
+                ],
+                {targetPath: 'target.checked'}
+              )}
             />
           }
           label={label}
@@ -444,11 +478,17 @@ function Form(props) {
 
   const recapLineSections = buildRecapLineSections();
 
+  const planCustomStyle = {
+    display: 'flex',
+    alignItems: 'flex-end',
+    justifyContent: 'center'
+  };
+
   return (
     <div className={classes.form}>
       <div className={classes.editable}>
         <Section classes={classes} title={"1. Choix du matériau"} key="materiau">{materiauSection}</Section>
-        <Section classes={classes} title={"2. Dimensions du plan"} key="plan">{planSection}</Section>
+        <Section classes={classes} title={"2. Dimensions du plan"} key="plan" containerCustomStyle={planCustomStyle}>{planSection}</Section>
         <Section classes={classes} title={"4. Choix du chanfrein"} key="shape">{shapeSection}</Section>
         <Section classes={classes} title={"5. Choix des découpes"} key="decoupe">{decoupeSection}</Section>
         <Section classes={classes} title={"6. Nos services"} key="service">{serviceSection}</Section>
@@ -468,7 +508,7 @@ function Form(props) {
           classes={classes}
           customStyle={{
             position: 'sticky',
-            top: '16px'
+            top: '100px'
           }}
           title={"Estimation du devis"}
           lineSections={recapLineSections}

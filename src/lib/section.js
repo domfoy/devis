@@ -11,7 +11,7 @@ function Section(props) {
         >
           <span>{props.title}</span>
         </CardHeader>
-        <CardContent>
+        <CardContent style={props.containerCustomStyle}>
           {props.children}
         </CardContent>
       </Card>

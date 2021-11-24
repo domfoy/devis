@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import React from 'react';
 
 import {
   formatPrice,
@@ -24,19 +25,19 @@ function buildLine(line, index) {
       justifyContent: 'space-between',
       padding: 8
     }}
-    key={index}
+    key={index+1}
   >
-    <div>{line.label}</div>
-    <div>{line.value}</div>
+    <div style={{padding: '0px 4px'}}>{line.label}</div>
+    <div style={{padding: '0px 4px'}}>{line.value}</div>
   </div>;
 }
 
-const breakLine = (<hr></hr>);
+const breakLine = (<hr key={0}></hr>);
 
 function buildLineSection(lineSection, index, lineSections) {
   const lineSectionsCount = lineSections.length;
 
-  return <>
+  return <React.Fragment key={index}>
     {_.map(
       lineSection,
       buildLine
@@ -46,8 +47,7 @@ function buildLineSection(lineSection, index, lineSections) {
         ? breakLine
         : null
     }
-
-  </>
+  </React.Fragment>
 }
 
 

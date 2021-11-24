@@ -55,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
 function CardImage(props) {
   return (
     <Card>
-      <CardActionArea>
+      <CardActionArea style={{display: 'flex', flexDirection: 'column'}}>
         <img
           src={props.src}
           alt={props.title}
@@ -79,6 +79,7 @@ function CardImage(props) {
 
 function Shape(props) {
   const [state, setState] = useState('initial');
+  const [anchorEl, setAnchorEl] = useState(null);
   const classes = useStyles();
 
   const buildImages = useCallback(
@@ -119,9 +120,14 @@ function Shape(props) {
     )
   };
 
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+    toggleMode();
+  }
+
   const button = <ButtonBase
     className={classes.root}
-    onClick={toggleMode}
+    onClick={handleClick}
   >
     <CardImage
       src={image.url}
@@ -134,7 +140,7 @@ function Shape(props) {
       {button}
       <Menu
         id="simple-menu"
-        anchorEl={button}
+        anchorEl={anchorEl}
         keepMounted
         open={state === 'choice'}
         onClose={toggleMode}

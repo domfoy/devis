@@ -16,7 +16,7 @@ export const formes = {
     "title": "Chant quart-cercle"
   },
   standard: {
-    "price": 0,
+    "price": 7,
     "title": "Chant standard"
   }
 };
@@ -52,30 +52,37 @@ export const services = {
   priseCoteInf: {
     label: 'Prise de côte rayon < 50km',
     price: 90,
+    exclusivityId: 'priseCote',
   },
   priseCoteSup: {
     label: 'Prise de côte rayon >= 50km',
     price: 170,
+    exclusivityId: 'priseCote',
   },
   livInf: {
     label: 'Livraison rayon < 50km',
     price: 110,
+    exclusivityId: 'livraison',
   },
   livSup: {
     label: 'Livraison rayon >= 50km',
     price: 190,
+    exclusivityId: 'livraison',
   },
   poseInf: {
     label: 'Pose plan de travail <3 m2',
     price: 350,
+    exclusivityId: 'pose',
   },
   poseMid: {
     label: 'Pose plan de travail >= 3 et <5 m2',
     price: 420,
+    exclusivityId: 'pose',
   },
   poseSup: {
     label: 'Pose plan de travail >= 5 m2',
     price: 530,
+    exclusivityId: 'pose',
   },
   raccord: {
     label: 'Raccordement évier et plaque de cuisson',
